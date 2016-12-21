@@ -8,6 +8,9 @@ from gi.repository import Notify as notify
 from gi.repository import GLib
 
 from threading import Thread
+from subprocess import call
+from datetime import datetime
+import os
 import time
 import math
 
@@ -27,9 +30,29 @@ def main():
     
 
 def checkin_time():
-    with open('/proc/uptime', 'r') as f:
-        uptime_seconds = float(f.readline().split()[0])
+    if os.path.isfile('todays_uptime'):
+        if os.stat("todays_uptime").st_size != 0:
+            uptime_seconds = get_uptime()
+        else:
+            uptime_seconds = write_system_boot_time()
+    else:
+        uptime_seconds = write_system_boot_time()
     return uptime_seconds
+
+def write_system_boot_time():
+    boot_date_time = str(time.time())
+    t = open('todays_uptime', 'w')
+    t.write(boot_date_time)
+    t.close()
+    return 0.0
+
+def get_uptime():
+    with open('todays_uptime', 'r') as f:
+        system_boot_time = float(f.readline().split()[0])
+        if datetime.fromtimestamp(system_boot_time).date() != datetime.now().date():
+            return write_system_boot_time()
+        else:
+            return time.time() - system_boot_time
 
 def time_to_text(t):
     hours = int(math.floor(t / 60 / 60))
