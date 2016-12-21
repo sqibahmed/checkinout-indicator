@@ -8,7 +8,6 @@ from gi.repository import Notify as notify
 from gi.repository import GLib
 
 from threading import Thread
-from subprocess import call
 from datetime import datetime
 import os
 import time
